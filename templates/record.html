@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Record Bodyweight</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='media_queries.css') }}">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Bodyweight Tracker</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('record') }}">Record Weight</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('summary') }}">View Summary</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('set_goal') }}">Set Goal</a>
+                </li>
+                {% if current_user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+    <div class="container mt-5">
+        <h1>Record Your Bodyweight</h1>
+        <form method="POST" class="form-inline">
+            {{ form.hidden_tag() }}
+            <div class="form-group mb-2">
+                {{ form.weight.label(class="sr-only") }}
+                {{ form.weight(class="form-control", placeholder="Weight (kg)", required=true) }}
+            </div>
+            <button type="submit" class="btn btn-primary mb-2">Submit</button>
+            {% if error %}
+            <div class="alert alert-danger mt-2">{{ error }}</div>
+            {% endif %}
+        </form>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Home</a>
+    </div>
+</body>
+
+</html>

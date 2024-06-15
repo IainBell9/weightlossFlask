@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bodyweight Summary</title>
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='media_queries.css') }}"
+    />
+    <style>
+      .graph-container {
+        max-width: 100%;
+        overflow: auto;
+      }
+
+      .graph {
+        width: 100%;
+        height: auto;
+      }
+    </style>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="#">Bodyweight Tracker</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('record') }}">Record Weight</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('summary') }}">View Summary</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('set_goal') }}">Set Goal</a>
+          </li>
+          {% if current_user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </nav>
+    <div class="container mt-5">
+      <h1 class="text-center">Bodyweight Summary</h1>
+      <div class="card mb-4">
+        <div class="card-body text-center">
+          <p>Total entries: {{ summary.total_entries }}</p>
+          <p>Average weight: {{ summary.average_weight }} kg</p>
+          <p>Minimum weight: {{ summary.min_weight }} kg</p>
+          <p>Maximum weight: {{ summary.max_weight }} kg</p>
+        </div>
+      </div>
+      <div id="graph" class="chart-container"></div>
+      <script>
+        var graphJSON = {{ summary.graphJSON | safe }};
+        Plotly.newPlot('graph', graphJSON.data, graphJSON.layout);
+      </script>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </body>
+</html>
