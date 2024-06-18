@@ -6,7 +6,7 @@ def print_users():
         users = User.query.all()
         for user in users:
             print(
-                f'ID: {user.id}, Username: {user.username}, Email: {user.email}, Password: {user.password}')
+                f'ID: {user.id}, Username: {user.username}, Email: {user.email}, Goal:{user.goals}')
 
 
 if __name__ == "__main__":

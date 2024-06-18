@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
 from flask_wtf import FlaskForm
+from flask_migrate import Migrate
 from wtforms import StringField, PasswordField, SubmitField, FloatField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 import plotly.graph_objs as go
@@ -14,10 +15,9 @@ app.config['SECRET_KEY'] = 'your_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
+migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
-
-goal_file = os.path.join(app.instance_path, "goal.txt")
 
 # User model
 
@@ -28,6 +28,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
     weights = db.relationship('Weight', backref='user', lazy=True)
+    goals = db.relationship('Goal', backref='user', lazy=True)
 
     def set_password(self, password):
         self.password = bcrypt.generate_password_hash(password).decode('utf-8')
@@ -42,6 +43,15 @@ class Weight(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     weight = db.Column(db.Float, nullable=False)
     date = db.Column(db.DateTime, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+# Goal model
+
+
+class Goal(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    target_weight = db.Column(db.Float, nullable=False)
+    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 
@@ -92,6 +102,7 @@ class GoalForm(FlaskForm):
 
 @app.route('/')
 @app.route('/index')
+@login_required
 def index():
     last_weight = None
     progress = 0
@@ -104,16 +115,16 @@ def index():
         if last_entry:
             last_weight = last_entry.weight
 
-        if os.path.exists(goal_file):
-            with open(goal_file, 'r') as f:
-                goal_weight = float(f.read().strip())
-                if last_weight and goal_weight:
-                    weight_to_go = goal_weight - last_weight
-                    progress = max(
-                        0, min(100, ((goal_weight - last_weight) / goal_weight) * 100))
+        goal_entry = Goal.query.filter_by(
+            user_id=current_user.id).order_by(Goal.date.desc()).first()
+        if goal_entry:
+            goal_weight = goal_entry.target_weight
+            if last_weight and goal_weight:
+                weight_to_go = goal_weight - last_weight
+                progress = max(
+                    0, min(100, ((goal_weight - last_weight) / goal_weight) * 100))
 
-    # Pass the progress rounded to zero decimal places
-    return render_template('index.html', last_weight=last_weight, progress=round(progress), weight_to_go=weight_to_go)
+    return render_template('index.html', last_weight=last_weight, progress=round(progress), weight_to_go=weight_to_go, goal_weight=goal_weight)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -169,14 +180,12 @@ def record():
 def set_goal():
     form = GoalForm()
     if form.validate_on_submit():
-        try:
-            goal_weight = form.goal_weight.data
-            with open(goal_file, 'w') as f:
-                f.write(str(goal_weight))
-            flash('Goal weight set successfully!', 'success')
-            return redirect(url_for('index'))
-        except ValueError:
-            flash('Invalid input. Please enter a valid number.', 'danger')
+        goal_weight = form.goal_weight.data
+        new_goal = Goal(target_weight=goal_weight, user_id=current_user.id)
+        db.session.add(new_goal)
+        db.session.commit()
+        flash('Goal weight set successfully!', 'success')
+        return redirect(url_for('index'))
     return render_template('set_goal.html', form=form)
 
 

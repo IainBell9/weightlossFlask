@@ -4,14 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Record Bodyweight</title>
+    <title>Record Weight</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='media_queries.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+
 </head>
 
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="#">Bodyweight Tracker</a>
+        <a class="navbar-brand" href="#"><img src="{{ url_for('static', filename='logo.png') }}"
+                alt="Forged Tracker Logo">
+            Forged Tracker</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -19,7 +23,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('record') }}">Record Weight</a>
+                    <a class="nav-link" href="{{ url_for('index') }}">Home</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('summary') }}">View Summary</a>
@@ -43,20 +47,25 @@
         </div>
     </nav>
     <div class="container mt-5">
-        <h1>Record Your Bodyweight</h1>
-        <form method="POST" class="form-inline">
-            {{ form.hidden_tag() }}
-            <div class="form-group mb-2">
-                {{ form.weight.label(class="sr-only") }}
-                {{ form.weight(class="form-control", placeholder="Weight (kg)", required=true) }}
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h2 class="text-center">Record Weight</h2>
+                <form method="POST" action="{{ url_for('record') }}">
+                    {{ form.hidden_tag() }}
+                    <div class="form-group">
+                        {{ form.weight.label(class="form-label") }}
+                        {{ form.weight(class="form-control") }}
+                    </div>
+                    <div class="form-group text-center">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
             </div>
-            <button type="submit" class="btn btn-primary mb-2">Submit</button>
-            {% if error %}
-            <div class="alert alert-danger mt-2">{{ error }}</div>
-            {% endif %}
-        </form>
-        <a href="{{ url_for('index') }}" class="btn btn-secondary">Home</a>
+        </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 
 </html>

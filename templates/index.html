@@ -7,12 +7,15 @@
     <title>Bodyweight Tracker</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='media_queries.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+
 </head>
 
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="#">Bodyweight Tracker</a>
+        <a class="navbar-brand" href="#"><img src="{{ url_for('static', filename='logo.png') }}"
+                alt="Forged Tracker Logo">
+            Forged Tracker</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -86,14 +89,14 @@
                     </div>
                     <p class="text-muted">Milestone</p>
                     <div class="row">
-                        {% if weight_one_week_ago %}
+                        {% if goal_weight %}
                         <div class="col">
-                            <p>{{ weight_one_week_ago }}</p>
-                            <p class="text-muted">1 Week Ago</p>
+                            <p>{{ goal_weight }} Kg</p>
+                            <p class="text-muted">Goal Weight</p>
                         </div>
                         {% endif %}
                         <div class="col">
-                            <p>{{ progress | int }}%</p>
+                            <p>{{ progress }}%</p>
                             <p class="text-muted">Complete</p>
                         </div>
                         <div class="col">
