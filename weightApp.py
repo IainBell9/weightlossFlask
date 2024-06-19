@@ -8,7 +8,7 @@ from wtforms import StringField, PasswordField, SubmitField, FloatField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 import plotly.graph_objs as go
 from datetime import datetime
-import os
+from urllib.parse import quote
 
 app = Flask(__name__, static_url_path='/static', instance_relative_config=True)
 app.config['SECRET_KEY'] = 'your_secret_key'
@@ -18,6 +18,7 @@ bcrypt = Bcrypt(app)
 migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
+url = quote("examplestring")
 
 # User model
 
